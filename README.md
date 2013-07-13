@@ -1,4 +1,79 @@
 ElimEvents
 =====================
 
-Simple javascript event handler system
+Simple javascript event handler system.
+
+QUnit tests included in ElimEventsQunitTest.html.
+
+memorise
+-
+Setting memorise on an event object, will cause events to be fired after registering, if they have already been run (exmaple: register an event after onload event has occured will still cause the callback for to be called)
+
+ElimSignals - Methods
+-
+
+    setContext(value) -- set the default context to use
+    getHandler(name) -- returns Null or ElimEventItems
+    trigger(name, context, ... args) -- trigger event, context is optional
+    on(name, cb, isOnce, context) -- register callback for event, isOnce and context are optional
+    off(name, cb, context) --remove callback for event, context is require is you specificed a different context within 'on'
+    destroy() --clear and destroy
+    
+ElimEventItems - Methods
+-
+    
+    name()
+    add(cb, isOnce, context)
+    remove(cb, context)
+    count()
+    find(cb, context)
+    findIndex(cb, context)
+    execute(context, .... args)
+    destroy()
+
+Sample
+-------
+
+    function MyItemWithEvent(){
+      //passing "this" into ElimSignals will set the default context to MyItemWithEvent
+      this.events = new ElimSignals(this, { errorOnNullHandler: true });
+    }
+  
+    MyItemWithEvent.prototype = {
+      someCallBack: function(event, arg1){
+        //event will be an object of type 'EventData'
+        event.cancelBubble(); //prevent progogation of events
+        event.value = 'MyReturn Value'; //return a value
+        //event.context
+        console.log(event.name, arg1);
+        return false //return false will prevent any other callbacks being run
+      }
+    }
+  
+    var obj = new MyItemWithEvent();
+    var altContext = new Object();
+  
+    //Register event
+    obj.events.on('eventOne', obj.someCallBack);
+  
+    //Register event with differenet context (this within obj.someBacllback will now refer to altContext)
+    obj.events.on('eventOne', obj.someCallBack, false, altContext);
+  
+    //Register event, as called Once (will be removed after it is first called)
+    obj.events.on('eventOne', obj.someCallBack, true);
+    
+    //Register multipul events using the same callback, just pass a space seperate string of names
+    obj.events.on('eventOne eventTwo eventThree', obj.someCallBack);
+    
+    //Trigger an event - with no arguments
+    var ret1 = obj.events.trigger('eventOne');
+    //Trigger an event - with 1 argument
+    var ret2 = obj.events.trigger('eventOne', 'Argument One');
+    //Trigger an event - with 2 arguments
+    var ret3 = obj.events.trigger('eventOne', 'Argument One', 'Argument Two');
+    
+Sample - remove events
+-----
+
+    obj.events.off('eventOne', obj.someCallBack);
+    obj.events.off('eventOne', obj.someCallBack, someContext);
