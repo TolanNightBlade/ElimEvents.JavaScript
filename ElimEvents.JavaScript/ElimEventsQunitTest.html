@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Elim events - QUnit test</title>
+  <link rel="stylesheet" href="/css/qunit.css">
+</head>
+<body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <div class="well" style="margin:10px;"></div>
+    <script src="/lib/qunit.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css" />
+    <script type="text/javascript" src="/lib/jquery-1.10.1.min.js"></script>
+    <!--<script type="text/javascript" src="/elim.events.js"></script>//-->
+    <script type="text/javascript" src="/elim.events.min.0.5.0.js"></script>
+    <script>
+        if (!Function.prototype.bind) {
+            Function.prototype.bind = function () {
+                "use strict";
+                var fn = this, args = Array.prototype.slice.call(arguments), object = args.shift();
+                return function () {
+                    return fn.apply(object, args.concat(Array.prototype.slice.call(arguments)));
+                };
+            };
+        }
+
+        function EventItemOne() {
+            this.events = new window['ElimSignals'](this, { errorOnNullHandler: true });
+            
+            this.destroy = function () {
+                this.events.destroy();
+            }
+        }
+
+        function EventItemOne_testoneCallBack(e, arg1) {
+            e.value = arg1;
+            return arg1;
+        }
+
+        function EventItemTwo() {
+            this.handlers = [];
+            this.context = this;
+            this.errorOnNullHandler = true;
+            this.memorise = true;
+            window['ElimSignals']['util'].createOn(this);
+        }
+
+        //EventItemTwo.prototype = $.extend(EventItemTwo.prototype, window.ElimSignals.prototype);
+
+        var globalEventItemTwo1, globalEventItemTwo2;
+
+        module("ElimSignals");
+        test("Create test item one", function () {
+            var itm = new EventItemOne();
+            ok(itm.events !== null, "Events Object Exists");
+            if (itm.events !== null) {
+                strictEqual(typeof itm.events.on, 'function', 'Has on  function');
+                strictEqual(itm.events.on('testone', EventItemOne_testoneCallBack, false, itm).name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.events.getHandler('testone').name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.events.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+                
+                var eventData = itm.events.trigger('testone', itm, 'moo');
+
+                strictEqual(eventData.context, itm, 'CB data context is correct');
+
+                itm.events.off('testone', EventItemOne_testoneCallBack, itm);
+
+                strictEqual(itm.events.handlers[0].find(EventItemOne_testoneCallBack, itm), null, 'CB has been removed');
+
+                strictEqual(itm.events.getHandler('testone').count(), 0, 'Handlers testone has 0 events');
+            }
+
+            itm.destroy();
+
+            strictEqual(itm.events.handlers, null, 'Handlers have been destroyed.');
+        });
+
+        test("Create test item two (prototype)", function () {
+            var itm = new EventItemTwo();
+            ok(itm !== null, "Events Object Exists");
+            if (itm !== null) {
+                strictEqual(typeof itm.on, 'function', 'Has on  function');
+                strictEqual(itm.on('testone', EventItemOne_testoneCallBack, false, itm).name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.getHandler('testone').name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+
+                var eventData = itm.trigger('testone', itm, 'moo');
+
+                strictEqual(eventData.data[0], 'moo', 'CB data[0] is "moo"');
+                strictEqual(eventData.value, 'moo', 'CB return value is "moo"');
+                strictEqual(eventData.data.length, 1, 'CB data.length is 1');
+                strictEqual(eventData.context, itm, 'CB data context is correct');
+
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+
+                itm.off('testone', EventItemOne_testoneCallBack, itm);
+
+                strictEqual(itm.handlers[0].find(EventItemOne_testoneCallBack, itm), null, 'CB has been removed');
+
+                strictEqual(itm.getHandler('testone').count(), 0, 'Handlers testone has 0 events');
+            }
+
+            itm.destroy();
+
+            strictEqual(itm.handlers, null, 'Handlers have been destroyed.');
+        });
+
+        test("Test memorise fires", function () {
+            var itm = new EventItemTwo();
+            ok(itm !== null, "Events Object Exists");
+            if (itm !== null) {
+                strictEqual(typeof itm.on, 'function', 'Has on  function');
+                strictEqual(itm.on('testone', EventItemOne_testoneCallBack, false, itm).name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.getHandler('testone').name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+
+                var eventData = itm.trigger('testone', itm, 'moo');
+
+                var addedCBArgs, addedCB = itm.on('testone', function (e, a1) { console.log('@CB', e, a1); addedCBArgs = a1; return a1 }, false, itm);
+                strictEqual(addedCB.name, 'testone', 'Add second handler to testone');
+
+                strictEqual(eventData.data[0], 'moo', 'CB data[0] is "moo"');
+                strictEqual(eventData.value, 'moo', 'CB return value is "moo"');
+
+                strictEqual(addedCBArgs, 'moo', 'CB data[0] is "moo"');
+
+                strictEqual(eventData.data.length, 1, 'CB data.length is 1');
+                strictEqual(eventData.context, itm, 'CB data context is correct');
+
+                strictEqual(itm.getHandler('testone').count(), 2, 'Handlers testone has 2 events');
+
+                itm.off('testone', EventItemOne_testoneCallBack, itm);
+
+                strictEqual(itm.handlers[0].find(EventItemOne_testoneCallBack, itm), null, 'CB has been removed');
+
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 0 events');
+            }
+
+            itm.destroy();
+
+            strictEqual(itm.handlers, null, 'Handlers have been destroyed.');
+        });
+
+        test("Test isOnce cb", function () {
+            var itm = new EventItemTwo();
+            ok(itm !== null, "Events Object Exists");
+            if (itm !== null) {
+                strictEqual(itm.on('testone', EventItemOne_testoneCallBack, true, itm).name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+
+                var eventData = itm.trigger('testone', itm, 'moo');
+
+                strictEqual(eventData.data[0], 'moo', 'CB data[0] is "moo"');
+                strictEqual(eventData.value, 'moo', 'CB return value is "moo"');
+                strictEqual(itm.getHandler('testone').count(), 0, 'Handlers testone has 0 events');
+            }
+        });
+
+        test("Test adding duplicate cb", function () {
+            var itm = new EventItemTwo();
+            ok(itm !== null, "Events Object Exists");
+            if (itm !== null) {
+                strictEqual(itm.on('testone', EventItemOne_testoneCallBack, false, itm).name, 'testone', 'Handlers testone exists');
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+
+                itm.on('testone', EventItemOne_testoneCallBack, false, itm);
+                strictEqual(itm.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
+
+                itm.on('testone', EventItemOne_testoneCallBack.bind(this), false, itm);
+                strictEqual(itm.getHandler('testone').count(), 2, 'Handlers testone has 2 event(s)');
+
+                var eventData = itm.trigger('testone', itm, 'moo');
+
+                strictEqual(eventData.data[0], 'moo', 'CB data[0] is "moo"');
+                strictEqual(eventData.value, 'moo', 'CB return value is "moo"');
+            }
+        });
+
+        test("Register 2 named callbacks with single function", function () {
+            var x = new EventItemTwo();
+
+            x.myCb = function (e, arg1) {
+                start();
+                strictEqual(e.context, x, "Check context");
+                strictEqual(arguments.length, 2, "Event triger has 2 arguments");
+                e.value = 'ret:' + arg1;
+            }.bind(x);
+
+            ok(x !== null, "Events Object Exists");
+            if (x !== null) {
+                stop();
+                stop();
+                x.on('ev1 ev2', x.myCb, false);
+
+                ok(x.getHandler('ev1') !== null, 'Event ev1 created');
+                ok(x.getHandler('ev2') !== null, 'Event ev2 created');
+
+                var ret1 = x.trigger('ev1', null, 'somedata1');
+                var ret2 = x.trigger('ev2', null, 'somedata2');
+
+                strictEqual(ret1.data[0], 'somedata1', "Check data for trigger one = somedata1");
+                strictEqual(ret2.data[0], 'somedata2', "Check data for trigger two = somedata2");
+                strictEqual(ret1.value, 'ret:somedata1', "Check return value for trigger one = ret:somedata1");
+                strictEqual(ret2.value, 'ret:somedata2', "Check return value for trigger two = ret:somedata2");
+            }
+        });
+
+        test("Test two", function () {
+            globalEventItemTwo1 = new EventItemTwo(); //new window['ElimSignals'](this, { errorOnNullHandler: true });// 
+            globalEventItemTwo2 = new EventItemTwo(); //new window['ElimSignals'](this, { errorOnNullHandler: true });//
+
+            var x, someCB = function () {
+                this.regOne = function () {
+                    start();
+                    strictEqual(globalEventItemTwo1.on('testone', this.cbOne, false, this).name, 'testone', 'Handlers (globalEventItemTwo1) testone exists');
+                }
+                this.cbOne = function () {
+                    start();
+                    console.log(this);
+                    strictEqual(this, x, 'cbOne context correct');
+                }
+            };
+
+            stop();
+            stop();
+
+            ok(globalEventItemTwo1 !== null, "Events Object Exists");
+            ok(globalEventItemTwo2 !== null, "Events Object Exists");
+            if (globalEventItemTwo1 !== null && globalEventItemTwo2 !== null) {
+                strictEqual(globalEventItemTwo1.on('testone', EventItemOne_testoneCallBack, false).name, 'testone', 'Handlers (globalEventItemTwo1) testone exists');
+                strictEqual(globalEventItemTwo2.on('testone', EventItemOne_testoneCallBack, false).name, 'testone', 'Handlers (globalEventItemTwo2) testone exists');
+
+                strictEqual(globalEventItemTwo1.getHandler('testone').count(), 1, 'Handlers (globalEventItemTwo1) testone has 1 event');
+                strictEqual(globalEventItemTwo2.getHandler('testone').count(), 1, 'Handlers (globalEventItemTwo2) testone has 1 event');
+
+                strictEqual(globalEventItemTwo1.on('testone', EventItemOne_testoneCallBack.bind(this), false).name, 'testone', 'Handlers (globalEventItemTwo1) testone exists');
+                strictEqual(globalEventItemTwo2.on('testone', EventItemOne_testoneCallBack.bind(this), false).name, 'testone', 'Handlers (globalEventItemTwo2) testone exists');
+
+                strictEqual(globalEventItemTwo1.getHandler('testone').count(), 2, 'Handlers (globalEventItemTwo1) testone has 1 event');
+                strictEqual(globalEventItemTwo2.getHandler('testone').count(), 2, 'Handlers (globalEventItemTwo2) testone has 1 event');
+
+                strictEqual(globalEventItemTwo1.on('testone', EventItemOne_testoneCallBack, false).name, 'testone', 'Handlers (globalEventItemTwo1) testone exists');
+                strictEqual(globalEventItemTwo1.getHandler('testone').count(), 2, 'Handlers (globalEventItemTwo1) testone has 1 event');
+
+                x = new someCB();
+
+                x.regOne();
+                globalEventItemTwo1.trigger('testone');
+            }
+        });
+        
+    </script>
+</body>
+</html>
