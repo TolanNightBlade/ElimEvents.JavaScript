@@ -15,6 +15,7 @@
     function EventData(name, data) {
         this._cb = false;
         this.context = null;
+        this.target = null;
         this.data = data;
         this.value =  null;
         this.name = name;
@@ -110,9 +111,10 @@
                 len = items.length,
                 itm,
                 _ctx = arguments[0] || this.context,
-                _args = arguments[1] || [],
+                _args = arguments[2] || [],
                 event = new EventData(this.name, _args);
-
+            console.log(arguments[0]);
+            event.target = arguments[1] || _ctx;
             event.context = _ctx;
 
             for (i = 0; i < len; i = (i + 1)) {
@@ -173,14 +175,20 @@
             this.handlers.push(itm);
             return itm;
         },
-        trigger: function (name, context) {
-            var args = slice.call(arguments,2), handler = this.getHandler(name);
+        _trigger: function (name, target, context) {
+            var args = slice.call(arguments, 3), handler = this.getHandler(name);
             if (!handler) {
                 if (!this.errorOnNullHandler) { return; }
                 throw new Error('No handler with the name {name} could be found.'.replace('{name}', name));
             }
 
-            return handler.execute(context || this.context, args);
+            return handler.execute(context || this.context, target, args);
+        },
+        trigger: function (name, context) {
+            return this._trigger.apply(this, [name, null, context].concat(slice.call(arguments, 2)));
+        },
+        triggerWithTarget: function (name, target, context) {
+            return this._trigger.apply(this, [name, target, context].concat(slice.call(arguments, 2)));
         },
         _on: function (name, cb, isOnce, context) {
             var handler = this.getHandler(name), ctx = context || this.context;

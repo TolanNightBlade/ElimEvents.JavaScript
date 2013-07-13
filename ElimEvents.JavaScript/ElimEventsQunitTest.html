@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/bootstrap-responsive.min.css" />
     <script type="text/javascript" src="/lib/jquery-1.10.1.min.js"></script>
-    <!--<script type="text/javascript" src="/elim.events.js"></script>//-->
-    <script type="text/javascript" src="/elim.events.min.0.5.0.js"></script>
+    <script type="text/javascript" src="/elim.events.js"></script>
+    <!--<script type="text/javascript" src="/elim.events.min.0.5.0.js"></script>//-->
     <script>
         if (!Function.prototype.bind) {
             Function.prototype.bind = function () {
@@ -28,7 +28,7 @@
 
         function EventItemOne() {
             this.events = new window['ElimSignals'](this, { errorOnNullHandler: true });
-            
+
             this.destroy = function () {
                 this.events.destroy();
             }
@@ -60,7 +60,7 @@
                 strictEqual(itm.events.on('testone', EventItemOne_testoneCallBack, false, itm).name, 'testone', 'Handlers testone exists');
                 strictEqual(itm.events.getHandler('testone').name, 'testone', 'Handlers testone exists');
                 strictEqual(itm.events.getHandler('testone').count(), 1, 'Handlers testone has 1 event');
-                
+
                 var eventData = itm.events.trigger('testone', itm, 'moo');
 
                 strictEqual(eventData.context, itm, 'CB data context is correct');
@@ -250,7 +250,7 @@
                 globalEventItemTwo1.trigger('testone');
             }
         });
-        
+
     </script>
 </body>
 </html>
