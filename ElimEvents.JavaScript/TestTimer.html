@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Elim events - test timer</title>
+</head>
+<body>
+    <div class="well" style="margin:10px;"><ul class="results"></ul></div>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap-responsive.min.css" />
+    <script type="text/javascript" src="/lib/jquery-1.10.1.min.js"></script>
+    <script type="text/javascript" src="/elim.events.js"></script>
+    <!--<script type="text/javascript" src="/elim.events.min.0.5.0.js"></script>//-->
+    <script>
+        if (!Function.prototype.bind) {
+            Function.prototype.bind = function () {
+                "use strict";
+                var fn = this, args = Array.prototype.slice.call(arguments), object = args.shift();
+                return function () {
+                    return fn.apply(object, args.concat(Array.prototype.slice.call(arguments)));
+                };
+            };
+        }
+
+        function EventItemOne() {
+            this.events = new window['ElimSignals'](this, { errorOnNullHandler: true });
+
+            this.destroy = function () {
+                this.events.destroy();
+            }
+        }
+
+        function EventItemOne_testoneCallBack(e, arg1) {
+            e.value = arg1;
+            return arg1;
+        }
+
+        function EventItemTwo() {
+            this.handlers = [];
+            this.context = this;
+            this.errorOnNullHandler = true;
+            this.memorise = true;
+            window['ElimSignals']['util'].createOn(this);
+
+            this.run = function () {
+                this.trigger('eventOne');
+            }.bind(this);
+
+            this.run2 = function () {
+                this.trigger('eventOne', this, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a');
+            }.bind(this);
+        }
+
+        var globalEventItemTwo1 = new EventItemTwo(),
+            globalEventItemTwo2 = new EventItemOne(), results;
+
+        globalEventItemTwo1.on('eventOne', function () {  }, false, null);
+
+        (function (g) {
+            var tests = [];
+
+            var timer, Timer = function () {
+                this.currentIx = -1;
+                this.holder = null;
+                this.loops = 1000;
+            }
+
+            Timer.prototype = {
+                setHolder: function (itm) {
+                    this.holder = $(itm);
+                    this.holder.empty();
+                },
+                setDefaultLoops: function (loops) {
+                    this.loops = loops > 0 ? loops : this.loops;
+                },
+                add: function (name, func, args, loops) {
+                    tests.push({ name: name, f: func, args: args, loops: loops || this.loops });
+                },
+                _finish: function(){
+                },
+                _start: function () {
+                    this.currentIx = (this.currentIx + 1);
+                    if (this.currentIx >= tests.length) { this._finish(); return; }
+                    this._run(this.currentIx);
+                },
+                _run: function (ix) {
+                    var itm = tests[ix], start= Date.now(), end, diff, i, len = itm.loops;
+
+                    for (i = 0; i < len; i = (i + 1)) {
+                        itm.f.apply(null, itm.args || []);
+                    }
+
+                    end = Date.now();
+                    diff = end - start;
+                    this._formatResult(itm, start, end, diff);
+                    setTimeout(this._start.bind(this), 10);
+                },
+                _formatResult: function (itm, start, end, diff) {
+                    var el = $('<li><span class="name"></span><span style="padding:0 10px;" class="msTaken"></span><span class="msperLoop"></span></li>');
+                    el.find('.name').html(itm.name + ' (loops: ' + itm.loops + ')');
+                    el.find('.msTaken').html(diff + 'ms');
+                    el.find('.msperLoop').html((diff / itm.loops).toFixed(4));
+                    this.holder.append(el);
+                }
+            };
+
+            timer = new Timer();
+
+            g['timer'] = timer;
+        })(window);
+
+        window['timer'].setDefaultLoops(5000);
+        window['timer'].add('event dispatch one', globalEventItemTwo1.run);
+        window['timer'].add('event dispatch x args', globalEventItemTwo1.run2);
+
+        $(document).ready(function () {
+            results = $('.results');
+            window['timer'].setHolder(results);
+            window['timer']._start();
+        });
+    </script>
+</body>
+</html>

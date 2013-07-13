@@ -23,13 +23,7 @@
 
     EventData.prototype = {
         isBubleCancelled: function () { return this._cb; },
-        cancelBubble: function () { this._cb = true; },
-        reset: function () {
-            this._cb = false;
-            this.data = null;
-            this.value = null;
-            this.name = null;
-        }
+        cancelBubble: function () { this._cb = true; }
     };
 
     /**
@@ -175,8 +169,8 @@
             this.handlers.push(itm);
             return itm;
         },
-        _trigger: function (name, target, context) {
-            var args = slice.call(arguments, 3), handler = this.getHandler(name);
+        _trigger: function (name, target, context, args) {
+            var handler = this.getHandler(name);
             if (!handler) {
                 if (!this.errorOnNullHandler) { return; }
                 throw new Error('No handler with the name {name} could be found.'.replace('{name}', name));
@@ -185,10 +179,10 @@
             return handler.execute(context || this.context, target, args);
         },
         trigger: function (name, context) {
-            return this._trigger.apply(this, [name, null, context].concat(slice.call(arguments, 2)));
+            return this._trigger(name, null, context, slice.call(arguments, 2));
         },
         triggerWithTarget: function (name, target, context) {
-            return this._trigger.apply(this, [name, target, context].concat(slice.call(arguments, 2)));
+            return this._trigger(name, target, context, slice.call(arguments, 3));
         },
         _on: function (name, cb, isOnce, context) {
             var handler = this.getHandler(name), ctx = context || this.context;
