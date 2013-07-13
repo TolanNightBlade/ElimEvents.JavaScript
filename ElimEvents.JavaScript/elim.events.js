@@ -1,4 +1,4 @@
-﻿/** @license
+﻿/*! @license
  * ElimSignals <https://github.com/TolanNightBlade/ElimEvents.JavaScript/>
  * Released under the MIT license
  * Author: Michael Wood
