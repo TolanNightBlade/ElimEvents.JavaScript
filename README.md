@@ -7,6 +7,8 @@ QUnit tests included in ElimEventsQunitTest.html. Tested in IE7-10, Chrome 28, F
 
 Compiled Size: 1.18KB gzipped (3.15KB uncompressed) --according to Closure Compiler
 
+<a href="//github.com/TolanNightBlade/ElimEvents.JavaScript/blob/master/ElimEvents.JavaScript/elim.events.js">Main JS file</a>
+
 memorise
 -
 Setting memorise on an event object, will cause events to be fired after registering, if they have already been run (exmaple: register an event after onload event has occured will still cause the callback for to be called)
