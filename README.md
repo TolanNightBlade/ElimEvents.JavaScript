@@ -42,6 +42,11 @@ Sample
       //passing "this" into ElimSignals will set the default context to MyItemWithEvent
       this.events = new ElimSignals(this, { errorOnNullHandler: true });
     }
+    
+    //Add ElimSignals methods to existing class
+    function MyItemWithEvent2(){
+      ElimSignals.util.createOn(this);
+    }
   
     MyItemWithEvent.prototype = {
       someCallBack: function(event, arg1){
