@@ -28,6 +28,18 @@
             this.destroy = function () {
                 this.events.destroy();
             }
+
+            this.run = function () {
+                this.events.trigger('eventOne');
+            }.bind(this);
+
+            this.run2 = function () {
+                this.events.trigger('eventOne', this, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a');
+            }.bind(this);
+
+            this.run3 = function () {
+                this.events.trigger('eventTwo', this, 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a');
+            }.bind(this);
         }
 
         function EventItemOne_testoneCallBack(e, arg1) {
@@ -52,9 +64,19 @@
         }
 
         var globalEventItemTwo1 = new EventItemTwo(),
-            globalEventItemTwo2 = new EventItemOne(), results;
+            globalEventItemTwo2 = new EventItemOne();
 
-        globalEventItemTwo1.on('eventOne', function () {  }, false, null);
+        globalEventItemTwo1.on('eventOne', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventOne', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
+        globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
 
         (function (g) {
             var tests = [];
@@ -99,7 +121,7 @@
                     var el = $('<li><span class="name"></span><span style="padding:0 10px;" class="msTaken"></span><span class="msperLoop"></span></li>');
                     el.find('.name').html(itm.name + ' (loops: ' + itm.loops + ')');
                     el.find('.msTaken').html(diff + 'ms');
-                    el.find('.msperLoop').html((diff / itm.loops).toFixed(4));
+                    el.find('.msperLoop').html((diff / itm.loops).toFixed(4) + ' ms per loop');
                     this.holder.append(el);
                 }
             };
@@ -110,12 +132,14 @@
         })(window);
 
         window['timer'].setDefaultLoops(5000);
-        window['timer'].add('event dispatch one', globalEventItemTwo1.run);
-        window['timer'].add('event dispatch x args', globalEventItemTwo1.run2);
+        window['timer'].add('event dispatch no arguments', globalEventItemTwo1.run);
+        window['timer'].add('event dispatch 23 arguments', globalEventItemTwo1.run2);
+        window['timer'].add('event dispatch (10 listeners) 23 arguments', globalEventItemTwo2.run3);
+        window['timer'].add('event dispatch (event object) no arguments', globalEventItemTwo2.run);
+        window['timer'].add('event dispatch (event object) 23 arguments', globalEventItemTwo2.run2);
 
         $(document).ready(function () {
-            results = $('.results');
-            window['timer'].setHolder(results);
+            window['timer'].setHolder($('.results'));
             window['timer']._start();
         });
     </script>
