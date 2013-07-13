@@ -3,7 +3,7 @@ ElimEvents
 
 Simple javascript event handler system.
 
-QUnit tests included in ElimEventsQunitTest.html.
+QUnit tests included in ElimEventsQunitTest.html. Tested in IE7-10, Chrome 28, FireFox 22, Opera 12.16.
 
 Compiled Size: 1.18KB gzipped (3.15KB uncompressed) --according to Closure Compiler
 
