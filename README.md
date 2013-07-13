@@ -14,6 +14,8 @@ Setting memorise on an event object, will cause events to be fired after registe
 ElimSignals - Methods
 -
 
+    setEnabled(name, isEnabled) --set an event to enabled / disabled
+    isEnabled(name) --get event is enabled (true, false, null (if event does not exist))
     setContext(value) -- set the default context to use
     getHandler(name) -- returns Null or ElimEventItems
     trigger(name, context, ... args) -- trigger event, context is optional
