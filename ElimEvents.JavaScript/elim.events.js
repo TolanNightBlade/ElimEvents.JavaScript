@@ -1,4 +1,10 @@
-﻿(function (global) {
+﻿/** @license
+ * ElimSignals <https://github.com/TolanNightBlade/ElimEvents.JavaScript/>
+ * Released under the MIT license
+ * Author: Michael Wood
+ * Version: 0.5.0 (2013/06/13 14:45)
+*/
+(function (global) {
     "use strict";
 
     var splice = Array.prototype.splice, slice = Array.prototype.slice;
