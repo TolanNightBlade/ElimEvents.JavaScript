@@ -6,6 +6,7 @@
 </head>
 <body>
     <div class="well" style="margin:10px;"><ul class="results"></ul></div>
+    <div class="complete"></div>
     <link rel="stylesheet" href="/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/bootstrap-responsive.min.css" />
     <script type="text/javascript" src="/lib/jquery-1.10.1.min.js"></script>
@@ -79,9 +80,7 @@
         globalEventItemTwo2.events.on('eventTwo', function () { }, false, null);
 
         (function (g) {
-            var tests = [];
-
-            var timer, Timer = function () {
+            var tests = [], timer, Timer = function () {
                 this.currentIx = -1;
                 this.holder = null;
                 this.loops = 1000;
