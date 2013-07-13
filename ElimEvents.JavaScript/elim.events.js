@@ -113,7 +113,7 @@
                 _ctx = arguments[0] || this.context,
                 _args = arguments[2] || [],
                 event = new EventData(this.name, _args);
-            console.log(arguments[0]);
+            
             event.target = arguments[1] || _ctx;
             event.context = _ctx;
 
