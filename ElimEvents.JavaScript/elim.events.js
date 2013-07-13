@@ -143,7 +143,18 @@
     }
 
     ElimSignals.prototype = {
-        setContext: function (v) { this.context = v;},
+        setContext: function (v) { this.context = v; },
+        setEnabled: function (name, isEnabled) {
+            var h = this.getHandler(name);
+            if (h === null) { throw new Error('No handler with the name {name} could be found.'.replace('{name}', name)); }
+            h.active = isEnabled();
+            return this;
+        },
+        isEnabled: function (name) {
+            var h = this.getHandler(name);
+            if (h === null) { return null; }
+            return h.active;
+        },
         getHandler: function (name) {
             var i, len = this.handlers.length;
             for (i = 0; i < len; i = (i + 1)) {
