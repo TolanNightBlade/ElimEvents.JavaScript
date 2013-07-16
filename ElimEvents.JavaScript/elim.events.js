@@ -140,7 +140,6 @@
         if (options === null || options === undefined) { options = {};}
         this.handlers = [];
         this.context = ctx || this;
-        this.errorOnNullHandler = typeof options.errorOnNullHandler === 'boolean' ? options.errorOnNullHandler : true;
         this.memorise = typeof options.memorise === 'boolean' ? options.memorise : true;
     }
 
@@ -172,10 +171,8 @@
         _trigger: function (name, target, context, args) {
             var handler = this.getHandler(name);
             if (!handler) {
-                if (!this.errorOnNullHandler) { return; }
-                throw new Error('No handler with the name {name} could be found.'.replace('{name}', name));
+                return;
             }
-
             return handler.execute(context || this.context, target, args);
         },
         trigger: function (name, context) {
