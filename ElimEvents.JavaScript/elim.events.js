@@ -7,7 +7,7 @@
 (function (global) {
     "use strict";
 
-    var splice = Array.prototype.splice, slice = Array.prototype.slice;
+    var slice = Array.prototype.slice;
 
     /**
     * @constructor
@@ -99,7 +99,7 @@
         },
         execute: function () {
             if (this.active === false) { return; }
-            var cancelBubble = false, executeVal,
+            var executeVal,
                 items = this.listeners.slice(),
                 i,
                 len = items.length,
