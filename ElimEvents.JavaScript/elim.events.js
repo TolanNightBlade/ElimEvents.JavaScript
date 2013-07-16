@@ -217,7 +217,7 @@
     global['ElimSignals']['util'] = {
         createOn: function (item) {
             var p;
-            ElimSignals.constructor.apply(item, [arguments[1]]);
+            ElimSignals.apply(item, [arguments[1]]);
             for (p in ElimSignals.prototype) {
                 if (ElimSignals.prototype.hasOwnProperty(p)) {
                     item[p] = ElimSignals.prototype[p];
