@@ -170,9 +170,7 @@
         },
         _trigger: function (name, target, context, args) {
             var handler = this.getHandler(name);
-            if (!handler) {
-                return;
-            }
+            if (!handler) { return; }
             return handler.execute(context || this.context, target, args);
         },
         trigger: function (name, context) {
