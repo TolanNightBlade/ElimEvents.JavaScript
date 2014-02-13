@@ -1,4 +1,4 @@
-﻿/*! @license
+/*! @license
  * ElimSignals <https://github.com/TolanNightBlade/ElimEvents.JavaScript/>
  * Released under the MIT license
  * Author: Michael Wood
@@ -17,7 +17,7 @@
         this.context = null;
         this.target = null;
         this.data = data;
-        this.value =  null;
+        this.value = null;
         this.name = name;
     }
 
@@ -84,8 +84,8 @@
             return this.listeners.length;
         },
         find: function (cb, context, returnIndex) {
-            var i, len = this.listeners.length, itm;
-            for (i = 0; i < len; i = (i + 1)) {
+            var i = 0, len = this.listeners.length, itm;
+            for (; i < len; i = (i + 1)) {
                 itm = this.listeners[i];
                 if (itm.cb === cb && itm.context === context) {
                     if (returnIndex) { return i; }
@@ -101,17 +101,17 @@
             if (this.active === false) { return; }
             var executeVal,
                 items = this.listeners.slice(),
-                i,
+                i = 0,
                 len = items.length,
                 itm,
                 _ctx = arguments[0] || this.context,
                 _args = arguments[2] || [],
                 event = new EventData(this.name, _args);
-            
+
             event.target = arguments[1] || _ctx;
             event.context = _ctx;
 
-            for (i = 0; i < len; i = (i + 1)) {
+            for (; i < len; i = (i + 1)) {
                 itm = items[i];
                 executeVal = itm.cb.apply(itm.context || _ctx, [event].concat(_args));
                 if (itm.isOnce) {
@@ -137,7 +137,7 @@
     * @constructor
     */
     function ElimSignals(ctx, options) {
-        if (options === null || options === undefined) { options = {};}
+        if (options === null || options === undefined) { options = {}; }
         this.handlers = [];
         this.context = ctx || this;
         this.memorise = typeof options.memorise === 'boolean' ? options.memorise : true;
@@ -157,9 +157,10 @@
             return h.active;
         },
         getHandler: function (name) {
-            var i, len = this.handlers.length;
-            for (i = 0; i < len; i = (i + 1)) {
-                if (this.handlers[i].name === name) { return this.handlers[i];}
+            var i = 0, len = this.handlers.length;
+            for (; i < len; i = (i + 1)) {
+                //console.log('getHandler', this.handlers[i].name, this.handlers[i]);
+                if (this.handlers[i].name === name) { return this.handlers[i]; }
             }
             return null;
         },
@@ -187,8 +188,8 @@
             return handler;
         },
         on: function (name, cb, isOnce, context) {
-            var names = name.split(' '), i, len = names.length, n = [];
-            for (i = 0; i < len; i = (i + 1)) {
+            var names = name.split(' '), i = 0, len = names.length, n = [];
+            for (; i < len; i = (i + 1)) {
                 n.push(this._on(names[i], cb, isOnce, context || this.context));
             }
             return len === 1 ? n[0] : n;
@@ -199,8 +200,8 @@
             handler.remove(cb, context || this.context);
         },
         off: function (name, cb, context) {
-            var names = name.split(' '), i, len = names.length, n = [];
-            for (i = 0; i < len; i = (i + 1)) {
+            var names = name.split(' '), i = 0, len = names.length, n = [];
+            for (; i < len; i = (i + 1)) {
                 n.push(this._off(names[i], cb, context));
             }
             return this;
